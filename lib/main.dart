@@ -1,74 +1,111 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'apiService.dart';
+import 'login/loginScreen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final ApiService apiService = ApiService(baseUrl: 'http://10.0.2.2:4401');
+
+  // @override
+  // Widget build(BuildContext context) {
+  //   return MaterialApp(
+  //     title: 'Flutter API Demo',
+  //     theme: ThemeData(primarySwatch: Colors.blue),
+  //     home: ApiHomePage(apiService: apiService),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter API Demo',
-      home: PostListPage(),
+    return MaterialApp(
+      title: 'Flutter Login',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: LoginScreen(apiService: apiService),
     );
   }
 }
 
-class PostListPage extends StatefulWidget {
-  const PostListPage({super.key});
+class ApiHomePage extends StatefulWidget {
+  final ApiService apiService;
+  const ApiHomePage({super.key, required this.apiService});
 
   @override
-  State<PostListPage> createState() => _PostListPageState();
+  State<ApiHomePage> createState() => _ApiHomePageState();
 }
 
-class _PostListPageState extends State<PostListPage> {
-  List<dynamic> posts = [];
-  bool isLoading = true;
-
-  Future<void> fetchPosts() async {
-    final response = await http.get(
-      Uri.parse('https://jsonplaceholder.typicode.com/posts'),
-    );
-
-    if (response.statusCode == 200) {
-      setState(() {
-        posts = json.decode(response.body);
-        isLoading = false;
-      });
-    } else {
-      throw Exception('Failed to load posts');
-    }
-  }
+class _ApiHomePageState extends State<ApiHomePage> {
+  List<dynamic> items = [];
 
   @override
   void initState() {
     super.initState();
-    fetchPosts();
+    _loadItems();
   }
+
+  Future<void> _loadItems() async {
+    final data = await widget.apiService.getAll('Mail');
+    setState(() {
+      items = data;
+    });
+  }
+
+  Future<void> _createItem() async {
+    final success = await widget.apiService.create('login', {
+      'name': 'New Item',
+      'value': 123,
+    });
+    if (success) _loadItems();
+  }
+
+  // Future<void> _updateItem(int id) async {
+  //   final success = await widget.apiService.update('your-endpoint', id, {
+  //     'name': 'Updated Name',
+  //     'value': 456,
+  //   });
+  //   if (success) _loadItems();
+  // }
+
+  // Future<void> _deleteItem(int id) async {
+  //   final success = await widget.apiService.delete('your-endpoint', id);
+  //   if (success) _loadItems();
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Danh sách bài viết')),
-      body:
-          isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : ListView.builder(
-                itemCount: posts.length,
-                itemBuilder: (context, index) {
-                  final post = posts[index];
-                  return ListTile(
-                    leading: CircleAvatar(child: Text(post['id'].toString())),
-                    title: Text(post['title']),
-                    subtitle: Text(post['body']),
-                  );
-                },
-              ),
+      appBar: AppBar(title: const Text('Test API')),
+      body: ListView.builder(
+        itemCount: items.length,
+        itemBuilder: (_, index) {
+          final item = items[index];
+          return ListTile(
+            title: Text(item['name'] ?? ''),
+            subtitle: Text('Value: ${item['value']}'),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              // children: [
+              //   IconButton(
+              //     icon: const Icon(Icons.edit),
+              //     onPressed: () => _updateItem(item['id']),
+              //   ),
+              //   IconButton(
+              //     icon: const Icon(Icons.delete),
+              //     onPressed: () => _deleteItem(item['id']),
+              //   ),
+              // ],
+            ),
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _createItem,
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }
