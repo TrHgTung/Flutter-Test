@@ -1,81 +1,75 @@
 import 'package:flutter/material.dart';
-import '../apiService.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class LoginScreen extends StatefulWidget {
-  final ApiService apiService;
-
-  const LoginScreen({super.key, required this.apiService});
-
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  _LoginScreenState createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-  bool isLoading = false;
-  String? error;
+  final _storage = FlutterSecureStorage();
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
+  String _error = '';
 
-  void _handleLogin() async {
-    setState(() {
-      isLoading = true;
-      error = null;
-    });
+  Future<void> _login() async {
+    final uri = Uri.parse('http://localhost:4401/login');
+
+    // Tạo multipart request
+    var request = http.MultipartRequest('POST', uri);
+
+    // Gửi field đúng tên giống ReactJS: Email, Password (chữ hoa đầu)
+    request.fields['Email'] = _usernameController.text;
+    request.fields['Password'] = _passwordController.text;
 
     try {
-      final result = await widget.apiService.login(
-        emailController.text.trim(),
-        passwordController.text.trim(),
-      );
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
 
-      final token = result['token'];
-      final displayName = result['display_name'];
-      final smtpPassword = result['SMTP_pswrd'];
-      final user = result['user'];
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        final token = json['token'];
 
-      // Gợi ý: Lưu token vào local storage (SharedPreferences) nếu cần
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Xin chào $displayName')));
-
-      // TODO: Chuyển sang trang chính sau khi login
+        await _storage.write(key: 'auth_token', value: token);
+        Navigator.pushReplacementNamed(context, '/mail');
+      } else {
+        final json = jsonDecode(response.body);
+        setState(() {
+          _error = json['message'] ?? 'Đăng nhập thất bại. Vui lòng thử lại.';
+        });
+      }
     } catch (e) {
       setState(() {
-        error = e.toString().replaceFirst("Exception: ", "");
+        _error = 'Lỗi kết nối đến server.';
       });
-    } finally {
-      setState(() => isLoading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Đăng nhập')),
+      appBar: AppBar(title: Text('Đăng nhập')),
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: EdgeInsets.all(16.0),
         child: Column(
           children: [
             TextField(
-              controller: emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
+              controller: _usernameController,
+              decoration: InputDecoration(labelText: 'Tên đăng nhập'),
             ),
-            const SizedBox(height: 10),
             TextField(
-              controller: passwordController,
+              controller: _passwordController,
+              decoration: InputDecoration(labelText: 'Mật khẩu'),
               obscureText: true,
-              decoration: const InputDecoration(labelText: 'Mật khẩu'),
             ),
-            const SizedBox(height: 20),
-            if (error != null)
-              Text(error!, style: const TextStyle(color: Colors.red)),
-            ElevatedButton(
-              onPressed: isLoading ? null : _handleLogin,
-              child:
-                  isLoading
-                      ? const CircularProgressIndicator()
-                      : const Text('Đăng nhập'),
-            ),
+            SizedBox(height: 20),
+            ElevatedButton(onPressed: _login, child: Text('Đăng nhập')),
+            if (_error.isNotEmpty) ...[
+              SizedBox(height: 10),
+              Text(_error, style: TextStyle(color: Colors.red)),
+            ],
           ],
         ),
       ),
