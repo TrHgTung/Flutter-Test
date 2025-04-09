@@ -10,7 +10,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  final ApiService apiService = ApiService(baseUrl: 'http://10.0.2.2:4401');
+  // final ApiService apiService = ApiService(baseUrl: 'http://10.0.2.2:4401');
 
   @override
   Widget build(BuildContext context) {
