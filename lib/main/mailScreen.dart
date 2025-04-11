@@ -30,7 +30,7 @@ class MailItem {
     try {
       final parsed = DateFormat("HH:mm").parse(time);
       return DateFormat("HH:mm").format(parsed);
-    } catch (_) {
+    } catch (context) {
       return time;
     }
   }
@@ -111,7 +111,7 @@ class _MailScreenState extends State<MailScreen> {
     showDialog(
       context: context,
       builder:
-          (_) => AlertDialog(
+          (context) => AlertDialog(
             title: Text(mail.subject),
             content: Column(
               mainAxisSize: MainAxisSize.min,
@@ -142,7 +142,7 @@ class _MailScreenState extends State<MailScreen> {
     showDialog(
       context: context,
       builder:
-          (_) => AlertDialog(
+          (context) => AlertDialog(
             title: Text('Xác nhận đăng xuất'),
             content: Text('Bạn có chắc chắn muốn đăng xuất không?'),
             actions: [
