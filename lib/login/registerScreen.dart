@@ -74,10 +74,10 @@ class _RegisterScreenState extends State<Registerscreen> {
                     return 'Vui lòng nhập email';
                   }
                   final emailRegex = RegExp(
-                    r'^^[\w-\.]+@([\w-]+\.)+[\w-]{2,30}$',
+                    r'^[\w.-]+@([\w-]+\.)+[\w-]{2,30}$',
                   );
-                  if (!emailRegex.hasMatch(value)) {
-                    return 'Email không hợp lệ';
+                  if (!emailRegex.hasMatch(value) || value.length > 40) {
+                    return 'Địa chỉ e-mail này không hợp lệ';
                   }
                   return null;
                 },
@@ -115,7 +115,14 @@ class _RegisterScreenState extends State<Registerscreen> {
                 },
               ),
               SizedBox(height: 20),
-              ElevatedButton(onPressed: _register, child: Text('Đăng ký')),
+              ElevatedButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    _register();
+                  }
+                },
+                child: Text('Đăng ký'),
+              ),
               if (_error.isNotEmpty) ...[
                 SizedBox(height: 10),
                 Text(_error, style: TextStyle(color: Colors.red)),
