@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,13 +15,20 @@ class MyApp extends StatelessWidget {
       themeMode: ThemeMode.system,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.deepPurple),
-      home: const WelcomeScreen(),
+      home: WelcomeScreen(),
     );
   }
 }
 
 class WelcomeScreen extends StatelessWidget {
-  const WelcomeScreen({super.key});
+  WelcomeScreen({super.key});
+
+  final _storage = FlutterSecureStorage();
+
+  Future<bool> _isLoggedIn() async {
+    final token = await _storage.read(key: 'auth_token');
+    return token != null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,32 +62,55 @@ class WelcomeScreen extends StatelessWidget {
                 child: Image.asset('assets/images/Dragonite.png', height: 200),
               ),
               const Spacer(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/login');
-                    },
-                    icon: const Icon(Icons.login),
-                    label: const Text('Đăng nhập'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple,
-                      foregroundColor: Colors.white,
-                    ),
-                  ),
-                  OutlinedButton.icon(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/register');
-                    },
-                    icon: const Icon(Icons.app_registration),
-                    label: const Text('Đăng ký'),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.deepPurple,
-                      backgroundColor: Colors.white,
-                    ),
-                  ),
-                ],
+              FutureBuilder<bool>(
+                future: _isLoggedIn(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasData && snapshot.data == true) {
+                    return Center(
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/mail');
+                        },
+                        icon: const Icon(Icons.mail),
+                        label: const Text('Kiểm tra email'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.deepPurple,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    );
+                  } else {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/login');
+                          },
+                          icon: const Icon(Icons.login),
+                          label: const Text('Đăng nhập'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.deepPurple,
+                            foregroundColor: Colors.white,
+                          ),
+                        ),
+                        OutlinedButton.icon(
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/register');
+                          },
+                          icon: const Icon(Icons.app_registration),
+                          label: const Text('Đăng ký'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.deepPurple,
+                            backgroundColor: Colors.white,
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+                },
               ),
             ],
           ),
