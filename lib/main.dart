@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:my_first_flutter_application/login/registerScreen.dart';
+import 'package:my_first_flutter_application/main/ProfileScreen.dart';
 import 'package:my_first_flutter_application/main/mailScreen.dart';
 import 'dart:convert';
 import 'apiService.dart';
@@ -25,6 +26,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => WelcomeScreen(),
         '/login': (context) => LoginScreen(),
+        '/profile': (context) => ProfileScreen(),
         '/register': (context) => Registerscreen(),
         '/mail': (context) => MailScreen(),
       },

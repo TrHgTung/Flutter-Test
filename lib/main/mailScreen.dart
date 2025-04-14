@@ -173,6 +173,13 @@ class _MailScreenState extends State<MailScreen> {
         title: Text('Danh sách Email'),
         actions: [
           IconButton(
+            icon: Icon(Icons.person),
+            tooltip: 'Hồ sơ cá nhân',
+            onPressed: () {
+              Navigator.pushNamed(context, '/profile'); // Navigate to profile
+            },
+          ),
+          IconButton(
             icon: Icon(Icons.logout),
             tooltip: 'Đăng xuất',
             onPressed: () {

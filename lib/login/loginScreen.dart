@@ -50,6 +50,19 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    final token = await _storage.read(key: 'auth_token');
+    if (token != null) {
+      Navigator.pushReplacementNamed(context, '/mail');
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Đăng nhập')),
