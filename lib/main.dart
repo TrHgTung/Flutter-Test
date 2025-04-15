@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:my_first_flutter_application/login/registerScreen.dart';
 import 'package:my_first_flutter_application/main/ProfileScreen.dart';
+import 'package:my_first_flutter_application/main/addMailScreen.dart';
 import 'package:my_first_flutter_application/main/mailScreen.dart';
 import 'dart:convert';
 import 'apiService.dart';
@@ -29,6 +30,7 @@ class MyApp extends StatelessWidget {
         '/profile': (context) => ProfileScreen(),
         '/register': (context) => Registerscreen(),
         '/mail': (context) => MailScreen(),
+        '/addMail': (context) => AddMailScreen(),
       },
     );
   }

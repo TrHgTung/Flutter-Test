@@ -54,16 +54,15 @@ class _MailScreenState extends State<MailScreen> {
   Future<void> _fetchEmails() async {
     String _displayName = '';
     final token = await _storage.read(key: 'auth_token');
+    final userEmail = await _storage.read(key: 'user_email');
 
     _displayName = await _storage.read(key: 'display_name') ?? '';
-    if (_displayName.isEmpty) {
+    if (_displayName.isEmpty || token == null) {
       Navigator.pushReplacementNamed(context, '/');
       return;
     }
-    if (token == null) {
-      Navigator.pushReplacementNamed(context, '/');
-      return;
-    }
+
+    print("TOKEN: $token"); // để debug
 
     final response = await http.get(
       Uri.parse('http://localhost:4401/api/Mail'),
@@ -72,7 +71,7 @@ class _MailScreenState extends State<MailScreen> {
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> decoded = jsonDecode(response.body);
-      final List<dynamic> jsonList = decoded['all_mails_sent'] ?? [];
+      final List<dynamic> jsonList = decoded['data'] ?? [];
 
       _allEmails = jsonList.map((e) => MailItem.fromJson(e)).toList();
       _applySearchAndPagination();

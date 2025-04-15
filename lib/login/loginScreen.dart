@@ -32,9 +32,12 @@ class _LoginScreenState extends State<LoginScreen> {
         final json = jsonDecode(response.body);
         final token = json['token'];
         final displayName = json['display_name'];
+        final jsonUser = json['user'];
+        final userEmail = jsonUser['email'];
 
         await _storage.write(key: 'auth_token', value: token);
         await _storage.write(key: 'display_name', value: displayName);
+        await _storage.write(key: 'user_email', value: userEmail);
         Navigator.pushReplacementNamed(context, '/mail');
       } else {
         final json = jsonDecode(response.body);

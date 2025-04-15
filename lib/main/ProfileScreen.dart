@@ -87,7 +87,7 @@ class _ProfileState extends State<ProfileScreen> {
                     ),
                     SizedBox(height: 16),
                     Text(
-                      'Tên hiển thị: ${_userData!['display_name']}',
+                      'Tên hiển thị: ${_userData!['displayName']}',
                       style: TextStyle(
                         fontSize: 18,
                         // fontWeight: FontWeight.bold,
