@@ -4,6 +4,7 @@ import 'package:my_first_flutter_application/login/registerScreen.dart';
 import 'package:my_first_flutter_application/main/ProfileScreen.dart';
 import 'package:my_first_flutter_application/main/addMailScreen.dart';
 import 'package:my_first_flutter_application/main/mailScreen.dart';
+import 'package:my_first_flutter_application/suggestMail/viewAllSuggestScreen.dart';
 import 'dart:convert';
 import 'apiService.dart';
 import 'login/loginScreen.dart';
@@ -31,6 +32,7 @@ class MyApp extends StatelessWidget {
         '/register': (context) => Registerscreen(),
         '/mail': (context) => MailScreen(),
         '/addMail': (context) => AddMailScreen(),
+        '/suggestion': (context) => AllSuggest(),
       },
     );
   }
